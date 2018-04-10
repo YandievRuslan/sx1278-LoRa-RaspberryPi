@@ -17,6 +17,7 @@ int LoRa_begin(LoRa_ctl *modem){
     
     if(modem->eth.implicitHeader){
         lora_set_implicit_header(modem->spid);
+        lora_set_payload(modem->spid, modem->eth.payloadLen);
     }
     else{
         lora_set_explicit_header(modem->spid);
