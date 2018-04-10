@@ -239,12 +239,13 @@ void lora_calculate_packet_t(LoRa_ctl *modem){
     }
     
     Tsym = (pow(2, sf)/bw)*1000;
+    modem->eth.lowDataRateOptimize = (Tsym > 16);
+    
     Tpreamle = (modem->eth.preambleLen+4.25)*Tsym;
     payloadSymbNb = 8+ceil((double)(8*payload - 4*sf + 28 + 16 - 20*modem->eth.implicitHeader)/(4*(sf - 2*modem->eth.lowDataRateOptimize)))*ecr;
     Tpayload = payloadSymbNb*Tsym;
     Tpacket = Tpayload+Tpreamle;
     
-    modem->eth.lowDataRateOptimize = (Tsym > 16);
     modem->tx.data.Tsym = Tsym;
     modem->tx.data.Tpkt = Tpacket;
     modem->tx.data.payloadSymbNb = payloadSymbNb;
