@@ -233,3 +233,4 @@ void lora_set_agc(LoRa_ctl *modem);
 void lora_set_lna(LoRa_ctl *modem);
 void lora_set_ocp(LoRa_ctl *modem);
 void lora_set_implicit_header(int spid);
+void LoRa_receive(LoRa_ctl *modem);
