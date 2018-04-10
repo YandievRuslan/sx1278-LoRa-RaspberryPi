@@ -230,7 +230,12 @@ void lora_calculate_packet_t(LoRa_ctl *modem){
     unsigned bw = BW_VAL[(modem->eth.bw>>4)];
     unsigned sf = modem->eth.sf>>4;
     unsigned char ecr = 4+(modem->eth.ecr/2);
-    unsigned char payload = modem->tx.data.size;
+    if(modem->eth.implicitHeader){
+        unsigned char payload = modem->eth.payloadLen;
+    }
+    else{
+        unsigned char payload = modem->tx.data.size;
+    }
     
     Tsym = (pow(2, sf)/bw)*1000;
     Tpreamle = (modem->eth.preambleLen+4.25)*Tsym;
