@@ -13,6 +13,7 @@ modem.spiCS = 0;
 modem.tx.callback = tx_f;
 modem.tx.data.buf = txbuf;
 memcpy(modem.tx.data.buf, "LoRa", 5);//Data we'll sent
+modem.tx.data.size = 5;//Payload len
 modem.eth.preambleLen=6;
 modem.eth.bw = BW62_5;
 modem.eth.sf = SF12;
@@ -25,8 +26,7 @@ modem.eth.outPower = OP20;
 modem.eth.powerOutPin = PA_BOOST;
 modem.eth.AGC = 1;
 modem.eth.OCP = 240;
-modem.eth.payloadLen = 5;
-modem.eth.implicitHeader = 1;
+modem.eth.implicitHeader = 0;
 modem.eth.syncWord = 0x12;
 
 LoRa_begin(&modem);

@@ -25,7 +25,14 @@ int LoRa_begin(LoRa_ctl *modem){
     lora_set_errorcr(modem->spid, modem->eth.ecr);
     lora_set_bandwidth(modem->spid, modem->eth.bw);
     lora_set_sf(modem->spid, modem->eth.sf);
-    lora_set_crc_on(modem->spid);
+    
+    if(modem->eth.CRC){
+        lora_set_crc_on(modem->spid);
+    }
+    else{
+        lora_set_crc_off(modem->spid);
+    }
+    
     lora_set_tx_power(modem->spid, modem->eth.outPower, modem->eth.powerOutPin);
     lora_set_syncw(modem->spid, modem->eth.syncWord);
     lora_set_preamble(modem->spid, modem->eth.preambleLen);
@@ -179,14 +186,18 @@ void lora_get_snr(LoRa_ctl *modem){
 
 void rxDoneISRf(int gpio_n, int level, uint32_t tick, void *modemptr){
     LoRa_ctl *modem = (LoRa_ctl *)modemptr;
+    unsigned char rx_nb_bytes;
     if(lora_reg_read_byte(modem->spid, REG_IRQ_FLAGS) & IRQ_RXDONE){
         lora_reg_write_byte(modem->spid, REG_FIFO_ADDR_PTR, lora_reg_read_byte(modem->spid, REG_FIFO_RX_CURRENT_ADDR));
         
         if(modem->eth.implicitHeader){
             lora_reg_read_bytes(modem->spid, REG_FIFO, modem->rx.data.buf, modem->eth.payloadLen);
+            modem->rx.data.size = modem->eth.payloadLen;
         }
         else{
-            lora_reg_read_bytes(modem->spid, REG_FIFO, modem->rx.data.buf, lora_reg_read_byte(modem->spid, REG_RX_NB_BYTES));
+            rx_nb_bytes = lora_reg_read_byte(modem->spid, REG_RX_NB_BYTES);
+            lora_reg_read_bytes(modem->spid, REG_FIFO, modem->rx.data.buf, rx_nb_bytes);
+            modem->rx.data.size = rx_nb_bytes;
         }
         modem->rx.data.CRC = (lora_reg_read_byte(modem->spid, REG_IRQ_FLAGS) & 0x20);
         lora_get_rssi_pkt(modem);

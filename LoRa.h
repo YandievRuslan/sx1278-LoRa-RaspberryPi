@@ -122,28 +122,29 @@ typedef enum LnaGain{
 
 typedef struct{
     BandWidth bw;
-    SpreadingFactor sf;
+    SpreadingFactor sf; //only from SF7 to SF12. SF6 not support yet.
     ErrorCodingRate ecr;
-    double freq;
-    unsigned char resetGpioN;
-    unsigned char dio0GpioN;
+    double freq;// Frequency in Hz. Example 434000000
+    unsigned char resetGpioN;//raspberry GPIO pin connected to RESET pin of LoRa chip
+    unsigned char dio0GpioN;//raspberry GPIO pin connected to DIO0 pin of LoRa chip to detect TX and Rx done events.
     unsigned int preambleLen;
-    _Bool lowDataRateOptimize;
+    _Bool lowDataRateOptimize;//Dont touch it sets automatically
     OutputPower outPower;
-    PowerAmplifireOutputPin powerOutPin;
-    int curRSSI;
+    PowerAmplifireOutputPin powerOutPin;//This chips has to outputs for signal "High power" and regular.
+    int curRSSI;//Current ethereum RSSI
     unsigned char syncWord;
     LnaGain lnaGain;
-    _Bool lnaBoost;
-    _Bool AGC;
-    unsigned char OCP;
-    _Bool implicitHeader;
-    unsigned char payloadLen;
+    _Bool lnaBoost;//On/Off LNA boost
+    _Bool AGC;// On/Off AGC. If AGC is on, LNAGain not used
+    unsigned char OCP;//Over Current Protection. 0 to turn OFF. Else reduces current from 45mA to 240mA
+    _Bool implicitHeader;// 1 - implicit header. 0 - Explicit header.
+    unsigned char payloadLen;//Payload len that used in implicit mode. In Explicit header mode not used.
+    _Bool CRC;//1 - add CRC data and checking. 0 - remove CRC data and checking
 } Modem_cfg;
 
 typedef struct{
     char *buf;
-    unsigned char size;
+    unsigned char size;//Size of buffer. Used in Explicit header mode. 255 MAX size
     struct timeval last_time;
     double Tsym;
     double Tpkt;
@@ -200,6 +201,7 @@ void lora_set_syncw(int spid, unsigned char word);
 void lora_set_lora_mode(int spid);
 void lora_set_sf(int spid, SpreadingFactor sf);
 void lora_set_crc_on(int spid);
+void lora_set_crc_off(int spid);
 void lora_set_bandwidth(int spid, BandWidth bw);
 void lora_set_errorcr(int spid, ErrorCodingRate cr);
 void lora_set_freq(int spid, double freq);
