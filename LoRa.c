@@ -1,6 +1,5 @@
 #include "LoRa.h"
 
-    //TODO применить проверку соединения.
 int LoRa_begin(LoRa_ctl *modem){
     if (gpioInitialise() < 0)
     {
@@ -29,10 +28,10 @@ int LoRa_begin(LoRa_ctl *modem){
     lora_set_crc_on(modem->spid);
     lora_set_tx_power(modem->spid, modem->eth.outPower, modem->eth.powerOutPin);
     lora_set_syncw(modem->spid, modem->eth.syncWord);
-    lora_set_preamble(modem);
-    lora_set_agc(modem);
-    lora_set_lna(modem);
-    lora_set_ocp(modem);
+    lora_set_preamble(modem->spid, modem->eth.preambleLen);
+    lora_set_agc(modem->spid, modem->eth.AGC);
+    lora_set_lna(modem->spid, modem->eth.lnaGain, modem->eth.lnaBoost);
+    lora_set_ocp(modem->spid, modem->eth.OCP);
     
     lora_reg_write_byte(modem->spid, REG_FIFO_TX_BASE_ADDR, TX_BASE_ADDR);
     lora_reg_write_byte(modem->spid, REG_FIFO_RX_BASE_ADDR, RX_BASE_ADDR);
@@ -43,31 +42,32 @@ int LoRa_begin(LoRa_ctl *modem){
     return modem->spid;
 }
 
-void lora_set_ocp(LoRa_ctl *modem){
+
+void lora_set_ocp(int spid, unsigned char OCP){
     unsigned char OcpTrim;
-    if(modem->eth.OCP == 0){//turn off OCP
-        lora_reg_write_byte(modem->spid, REG_OCP, (lora_reg_read_byte(modem->spid, REG_OCP) & 0xdf));
+    if(OCP == 0){//turn off OCP
+        lora_reg_write_byte(spid, REG_OCP, (lora_reg_read_byte(spid, REG_OCP) & 0xdf));
     }
-    else if(modem->eth.OCP > 0 && modem->eth.OCP <= 120){
-        if(modem->eth.OCP < 50){modem->eth.OCP = 50;}
+    else if(OCP > 0 && OCP <= 120){
+        if(OCP < 50){OCP = 50;}
         
-        OcpTrim = (modem->eth.OCP-45)/5 + 0x20;
-        lora_reg_write_byte(modem->spid, REG_OCP, OcpTrim);
+        OcpTrim = (OCP-45)/5 + 0x20;
+        lora_reg_write_byte(spid, REG_OCP, OcpTrim);
     }
-    else if(modem->eth.OCP > 120){
-        if(modem->eth.OCP < 130){modem->eth.OCP = 130;}
+    else if(OCP > 120){
+        if(OCP < 130){OCP = 130;}
         
-        OcpTrim = (modem->eth.OCP+30)/10 + 0x20;
-        lora_reg_write_byte(modem->spid, REG_OCP, OcpTrim);
+        OcpTrim = (OCP+30)/10 + 0x20;
+        lora_reg_write_byte(spid, REG_OCP, OcpTrim);
     }
 }
 
-void lora_set_lna(LoRa_ctl *modem){
-    lora_reg_write_byte(modem->spid, REG_LNA,  ( (modem->eth.lnaGain << 5) + modem->eth.lnaBoost) );
+void lora_set_lna(int spid, LnaGain lnaGain, _Bool lnaBoost){
+    lora_reg_write_byte(spid, REG_LNA,  ( (lnaGain << 5) + lnaBoost) );
 }
 
-void lora_set_agc(LoRa_ctl *modem){
-    lora_reg_write_byte(modem->spid, REG_MODEM_CONFIG_3, (modem->eth.AGC << 2));
+void lora_set_agc(int spid, _Bool AGC ){
+    lora_reg_write_byte(spid, REG_MODEM_CONFIG_3, (AGC << 2));
 }
 
 void lora_set_tx_power(int spid, OutputPower power, PowerAmplifireOutputPin pa_pin){
@@ -119,7 +119,7 @@ void LoRa_send(LoRa_ctl *modem){
     if(lora_get_op_mode(modem->spid) != STDBY_MODE){
         lora_set_satandby_mode(modem->spid);
     }
-    lora_calculate_packet_t(modem);
+    LoRa_calculate_packet_t(modem);
     if(modem->eth.lowDataRateOptimize){
         lora_set_lowdatarateoptimize_on(modem->spid);
     }
@@ -141,7 +141,7 @@ void LoRa_send(LoRa_ctl *modem){
 
 void LoRa_receive(LoRa_ctl *modem){
     
-    lora_calculate_packet_t(modem);
+    LoRa_calculate_packet_t(modem);
     if(modem->eth.lowDataRateOptimize){
         lora_set_lowdatarateoptimize_on(modem->spid);
     }
@@ -221,7 +221,7 @@ unsigned char lora_get_op_mode(int spid){
     return (lora_reg_read_byte(spid, REG_OP_MODE) & 0x07);
 }
 
-void lora_calculate_packet_t(LoRa_ctl *modem){
+void LoRa_calculate_packet_t(LoRa_ctl *modem){
     unsigned BW_VAL[10] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
     
     double Tsym, Tpreamle, Tpayload, Tpacket;
@@ -327,18 +327,17 @@ _Bool LoRa_check_conn(LoRa_ctl *modem){
     return (modem->eth.syncWord == lora_reg_read_byte(modem->spid, REG_SYNC_WORD));
 }
 
-void lora_set_preamble(LoRa_ctl* modem)
-{
-    if(modem->eth.preambleLen < 6){
-        modem->eth.preambleLen = 6;
+void lora_set_preamble(int spid, unsigned int preambleLen){
+    if(preambleLen < 6){
+        preambleLen = 6;
     }
-    else if(modem->eth.preambleLen > 65535){
-        modem->eth.preambleLen = 65535;
+    else if(preambleLen > 65535){
+        preambleLen = 65535;
     }
     unsigned len_revers=0;
-    len_revers += ((unsigned char)(modem->eth.preambleLen>>0))<<8;
-    len_revers += ((unsigned char)(modem->eth.preambleLen>>8))<<0;
-    lora_reg_write_bytes(modem->spid, REG_PREAMBLE_MSB, (char *)&len_revers, 2);
+    len_revers += ((unsigned char)(preambleLen>>0))<<8;
+    len_revers += ((unsigned char)(preambleLen>>8))<<0;
+    lora_reg_write_bytes(spid, REG_PREAMBLE_MSB, (char *)&len_revers, 2);
 }
 
 void lora_set_payload(int spid, unsigned char payload){
