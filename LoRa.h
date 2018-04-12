@@ -187,6 +187,14 @@ typedef struct {
     LoRa_Tx tx;//tx structure
 } LoRa_ctl;
 
+int LoRa_begin(LoRa_ctl *modem);
+void LoRa_send(LoRa_ctl *modem);
+void LoRa_receive(LoRa_ctl *modem);
+_Bool LoRa_check_conn(LoRa_ctl *modem);
+void LoRa_end(LoRa_ctl *modem);
+void LoRa_stop_receive(LoRa_ctl *modem);
+
+
 void lora_set_syncw(int spid, unsigned char word);
 void lora_set_lora_mode(int spid);
 void lora_set_sf(int spid, SpreadingFactor sf);
@@ -216,21 +224,15 @@ void lora_set_txdone_dioISR(int gpio_n, txDoneISR func, LoRa_ctl *modem);
 void lora_remove_dioISR(int gpio_n);
 unsigned char lora_get_op_mode(int spid);
 void lora_calculate_packet_t(LoRa_ctl *modem);
-void LoRa_send(LoRa_ctl *modem);
 void lora_set_addr_ptr(int spid, unsigned char addr);
 void lora_set_lowdatarateoptimize_on(int spid);
 void lora_set_lowdatarateoptimize_off(int spid);
 unsigned char lora_write_fifo(int spid, char *buf, unsigned char size);
-int LoRa_begin(LoRa_ctl *modem);
-void LoRa_stop_receive(LoRa_ctl *modem);
-int LoRa_end(LoRa_ctl *modem);
 void lora_get_rssi_pkt(LoRa_ctl *modem);
 void lora_get_rssi_cur(LoRa_ctl *modem);
 void lora_get_snr(LoRa_ctl *modem);
 void lora_set_preamble(LoRa_ctl *modem);
-_Bool lora_check_conn(LoRa_ctl *modem);
 void lora_set_agc(LoRa_ctl *modem);
 void lora_set_lna(LoRa_ctl *modem);
 void lora_set_ocp(LoRa_ctl *modem);
 void lora_set_implicit_header(int spid);
-void LoRa_receive(LoRa_ctl *modem);

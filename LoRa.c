@@ -207,9 +207,9 @@ void txDoneISRf(int gpio_n, int level, uint32_t tick, void *modemptr){
     }
 }
 
-int LoRa_end(LoRa_ctl *modem){
+void LoRa_end(LoRa_ctl *modem){
     LoRa_stop_receive(modem);
-    return spiClose(modem->spid);
+    spiClose(modem->spid);
 }
 
 void LoRa_stop_receive(LoRa_ctl *modem){
@@ -323,7 +323,7 @@ void lora_set_freq(int spid, double freq){
     lora_reg_write_bytes(spid, REG_FR_MSB, (char *)&frf_revers, 3);
 }
 
-_Bool lora_check_conn(LoRa_ctl *modem){
+_Bool LoRa_check_conn(LoRa_ctl *modem){
     return (modem->eth.syncWord == lora_reg_read_byte(modem->spid, REG_SYNC_WORD));
 }
 
