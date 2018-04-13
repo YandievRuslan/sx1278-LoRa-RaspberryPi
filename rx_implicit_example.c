@@ -13,7 +13,8 @@ int main(){
 char rxbuf[255];
 LoRa_ctl modem;
 
-modem.spiCS = 0;
+//See for typedefs, enumerations and there values in LoRa.h header file
+modem.spiCS = 0;//Raspberry SPI CS pin number
 modem.rx.callback = rx_f;
 modem.rx.data.buf = rxbuf;
 modem.eth.payloadLen = 5;//payload len used in implicit header mode
@@ -31,6 +32,7 @@ modem.eth.AGC = 1;//Auto Gain Control
 modem.eth.OCP = 240;// 45 to 240 mA. 0 to turn off protection
 modem.eth.implicitHeader = 1;//Implicit header mode
 modem.eth.syncWord = 0x12;
+//For detail information about SF, Error Coding Rate, Explicit header, Bandwidth, AGC, Over current protection and other features refer to sx127x datasheet https://www.semtech.com/uploads/documents/DS_SX1276-7-8-9_W_APP_V5.pdf
 
 LoRa_begin(&modem);
 LoRa_receive(&modem);
