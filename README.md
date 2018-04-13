@@ -49,7 +49,7 @@
 <p>2. Clone the repo</p>
 <p>3. Enter cloned repo dir</p>
 <p>4. <em>make</em></p>
-<p>5. Try files under sudo: <em>transmit_explicit transmit_implicit receive_explicit receive_implicit</em></p>
+<p>5. Try files under sudo: <em>transmit_explicit, transmit_implicit, receive_explicit, receive_implicit</em></p>
 <p>All transmitt examples just ones send "LoRa" string with its '\0' terminating byte.</p>
 <p>&nbsp;</p>
 <h2><strong>TODO:</strong></h2>
