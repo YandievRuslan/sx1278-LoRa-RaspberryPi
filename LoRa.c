@@ -237,6 +237,7 @@ void LoRa_calculate_packet_t(LoRa_ctl *modem){
     
     double Tsym, Tpreamle, Tpayload, Tpacket;
     unsigned payloadSymbNb;
+    int tmpPoly;
     
     unsigned bw = BW_VAL[(modem->eth.bw>>4)];
     unsigned sf = modem->eth.sf>>4;
@@ -253,7 +254,11 @@ void LoRa_calculate_packet_t(LoRa_ctl *modem){
     modem->eth.lowDataRateOptimize = (Tsym > 16);
     
     Tpreamle = (modem->eth.preambleLen+4.25)*Tsym;
-    payloadSymbNb = 8+ceil((double)(8*payload - 4*sf + 28 + 16 - 20*modem->eth.implicitHeader)/(4*(sf - 2*modem->eth.lowDataRateOptimize)))*ecr;
+    tmpPoly = (8*payload - 4*sf + 28 + 16 - 20*modem->eth.implicitHeader);
+    if(tmpPoly<0){
+        tmpPoly=0;
+    }
+    payloadSymbNb = 8+ceil(((double)tmpPoly)/(4*(sf - 2*modem->eth.lowDataRateOptimize)))*ecr;
     Tpayload = payloadSymbNb*Tsym;
     Tpacket = Tpayload+Tpreamle;
     

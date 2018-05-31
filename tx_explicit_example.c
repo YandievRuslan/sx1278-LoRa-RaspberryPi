@@ -10,7 +10,7 @@ char txbuf[255];
 LoRa_ctl modem;
 
 //See for typedefs, enumerations and there values in LoRa.h header file
-modem.spiCS = 0;//Raspberry SPI CS pin number
+modem.spiCS = 0;//Raspberry SPI CE pin number
 modem.tx.callback = tx_f;
 modem.tx.data.buf = txbuf;
 memcpy(modem.tx.data.buf, "LoRa", 5);//copy data we'll sent to buffer

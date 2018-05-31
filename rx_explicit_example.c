@@ -15,7 +15,7 @@ char rxbuf[255];
 LoRa_ctl modem;
 
 //See for typedefs, enumerations and there values in LoRa.h header file
-modem.spiCS = 0;//Raspberry SPI CS pin number
+modem.spiCS = 0;//Raspberry SPI CE pin number
 modem.rx.callback = rx_f;
 modem.rx.data.buf = rxbuf;
 modem.eth.preambleLen=6;
