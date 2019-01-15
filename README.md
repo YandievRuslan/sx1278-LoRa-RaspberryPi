@@ -61,7 +61,7 @@
 <li style="text-align: left;"><strong>void LoRa_send(LoRa_ctl *modem) - </strong>Commands radio module to send&nbsp; data from buffer</li>
 <li style="text-align: left;"><strong>void LoRa_receive(LoRa_ctl *modem) - </strong>Commands radio module to switch to continuous receive mode</li>
 <li style="text-align: left;"><strong>void LoRa_calculate_packet_t(LoRa_ctl *modem) - </strong>Calculates onair time, payload symbols and other fields.</li>
-<li style="text-align: left;"><strong>_Bool LoRa_check_conn(LoRa_ctl *modem) - </strong>Checks connection vith module. Return True/False</li>
+<li style="text-align: left;"><strong>_Bool LoRa_check_conn(LoRa_ctl *modem) - </strong>Checks connection with module. Return True/False</li>
 <li style="text-align: left;"><strong>void LoRa_end(LoRa_ctl *modem) - </strong>Ends up working with module. Switches to sleep mode, closes spi and so on.</li>
 <li style="text-align: left;"><strong>void LoRa_stop_receive(LoRa_ctl *modem) -&nbsp;</strong>Removes callback from IRQ pin, switches module to idle mode.</li>
 <li style="text-align: left;"><strong>void LoRa_sleep(LoRa_ctl *modem) - </strong>Switches module to sleep mode</li>
