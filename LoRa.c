@@ -4,7 +4,7 @@ int LoRa_begin(LoRa_ctl *modem){
     if (gpioInitialise() < 0)
     {
         printf("Pigpio init error\n");
-        return 0;
+        return -1;
     }
     
     lora_reset(modem->eth.resetGpioN);
@@ -203,8 +203,13 @@ void rxDoneISRf(int gpio_n, int level, uint32_t tick, void *modemptr){
         lora_get_rssi_pkt(modem);
         lora_get_snr(modem);
         lora_reset_irq_flags(modem->spid);
-        modem->rx.callback(&modem->rx.data);
+        pthread_create(&(modem->rx.cbThread), NULL, startRxCallback, (void *)(modem));
     }
+}
+
+void * startRxCallback(void *arg){
+        LoRa_ctl *modem = (LoRa_ctl *)arg;
+        modem->rx.callback(&modem->rx.data);
 }
 
 void txDoneISRf(int gpio_n, int level, uint32_t tick, void *modemptr){
@@ -213,9 +218,14 @@ void txDoneISRf(int gpio_n, int level, uint32_t tick, void *modemptr){
         gettimeofday(&modem->tx.data.last_time, NULL);
         //lora_remove_dioISR(gpio_n);
         lora_reset_irq_flags(modem->spid);
-        modem->tx.callback(&modem->tx.data);
-        lora_set_sleep_mode(modem->spid);
+        lora_set_satandby_mode(modem->spid);
+        pthread_create(&(modem->tx.cbThread), NULL, startTxCallback, (void *)(modem));
     }
+}
+
+void * startTxCallback(void *arg){
+        LoRa_ctl *modem = (LoRa_ctl *)arg;
+        modem->tx.callback(&modem->tx.data);
 }
 
 void LoRa_end(LoRa_ctl *modem){
@@ -224,6 +234,11 @@ void LoRa_end(LoRa_ctl *modem){
 }
 
 void LoRa_stop_receive(LoRa_ctl *modem){
+    lora_remove_dioISR(modem->eth.dio0GpioN);
+    lora_set_satandby_mode(modem->spid);
+}
+
+void LoRa_sleep(LoRa_ctl *modem){
     lora_remove_dioISR(modem->eth.dio0GpioN);
     lora_set_sleep_mode(modem->spid);
 }
@@ -425,4 +440,8 @@ int lora_reg_write_bytes(int spid, unsigned char reg, char *buff, unsigned char 
     tx[0]=(reg | 0x80);
     memcpy(&tx[1], buff, size);
     return spiXfer(spid, tx, rx, size+1);
+}
+
+unsigned char LoRa_get_op_mode(LoRa_ctl *modem){
+    return lora_get_op_mode(modem->spid);
 }

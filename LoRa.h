@@ -1,4 +1,5 @@
 #include <pigpio.h>
+#include <pthread.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -47,6 +48,7 @@
 #define RX_BASE_ADDR 0x00
 
 #define LORA_MODE 0x80
+
 #define SLEEP_MODE 0x00
 #define STDBY_MODE 0x01
 #define TX_MODE 0x03
@@ -157,6 +159,7 @@ typedef void (*UserTxDoneCallback)(txData *tx);
 typedef struct{
     txData data;
     UserTxDoneCallback callback;
+    pthread_t cbThread;
 } LoRa_Tx;
 
 typedef void (*txDoneISR)(int gpio_n, int level, uint32_t tick, void *userdata);
@@ -176,6 +179,7 @@ typedef void (*UserRxDoneCallback)(rxData *rx);
 typedef struct{
     rxData data;
     UserRxDoneCallback callback;
+    pthread_t cbThread;
 } LoRa_Rx;
 
 typedef void (*rxDoneISR)(int gpio_n, int level, uint32_t tick, void *userdata);
@@ -189,13 +193,14 @@ typedef struct {
 } LoRa_ctl;
 
 int LoRa_begin(LoRa_ctl *modem);
-void LoRa_send(LoRa_ctl *modem);
-void LoRa_receive(LoRa_ctl *modem);
+void LoRa_send(LoRa_ctl *modem);//After sending auto switches to standby mode.
+void LoRa_receive(LoRa_ctl *modem);//Continuous mode. You have to manually stop receiving if you want to. For example you can do it in callback right after catching packet.
 void LoRa_calculate_packet_t(LoRa_ctl *modem);
 _Bool LoRa_check_conn(LoRa_ctl *modem);
 void LoRa_end(LoRa_ctl *modem);
 void LoRa_stop_receive(LoRa_ctl *modem);
-
+void LoRa_sleep(LoRa_ctl *modem);
+unsigned char LoRa_get_op_mode(LoRa_ctl *modem);// Compare with SLEEP_MODE, RXCONT_MODE, SLEEP_MODE, STDBY_MODE
 
 void lora_set_syncw(int spid, unsigned char word);
 void lora_set_lora_mode(int spid);
@@ -219,6 +224,8 @@ void lora_set_satandby_mode(int spid);
 void lora_set_tx_power(int spid, OutputPower power, PowerAmplifireOutputPin pa_pin);
 void rxDoneISRf(int gpio_n, int level, uint32_t tick, void *modem);
 void txDoneISRf(int gpio_n, int level, uint32_t tick, void *modem);
+void * startRxCallback(void *arg);
+void * startTxCallback(void *arg);
 void lora_set_dio_rx_mapping(int spid);
 void lora_set_dio_tx_mapping(int spid);
 void lora_set_rxdone_dioISR(int gpio_n, rxDoneISR func, LoRa_ctl *modem);
