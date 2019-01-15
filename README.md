@@ -54,16 +54,22 @@
 
 <h3><strong>API:</strong></h3>
 
-<p><strong>int LoRa_begin(LoRa_ctl *modem) -</strong> Configures radio module. Returns spi handle &gt;= 0 if OK, otherwise error number &lt; 0</p>
-<p><br /><strong>void LoRa_send(LoRa_ctl *modem) - </strong>Commands radio module to send&nbsp; data from buffer</p>
-<p><br /><strong>void LoRa_receive(LoRa_ctl *modem) - </strong>Commands radio module to switch to continuous receive mode</p>
-<p><strong>void LoRa_calculate_packet_t(LoRa_ctl *modem) - </strong>Calculates onair time, payload symbols and other fields.</p>
-<p><strong>_Bool LoRa_check_conn(LoRa_ctl *modem) - </strong>Checks connection vith module. Return True/False</p>
-<p><strong>void LoRa_end(LoRa_ctl *modem) - </strong>Ends up working with module. Switches to sleep mode, closes spi and so on.</p>
-<p><strong>void LoRa_stop_receive(LoRa_ctl *modem) -&nbsp;</strong>Removes callback from IRQ pin, switches module to idle mode.</p>
-<p><strong>void LoRa_sleep(LoRa_ctl *modem) - </strong>Switches module to sleep mode</p>
-<p><strong>unsigned char LoRa_get_op_mode(LoRa_ctl *modem)</strong> -<strong>&nbsp;</strong>Returns current module operational mode - SLEEP_MODE, RXCONT_MODE, SLEEP_MODE, STDBY_MODE</p>
-<p><strong>struct&nbsp;LoRa_ctl - </strong>view LoRa.h</p>
+<ul style="list-style-type: disc;">
+<li style="text-align: left;"><strong>int LoRa_begin(LoRa_ctl *modem) -</strong> Configures radio module. Returns spi handle &gt;= 0 if OK, otherwise error number &lt; 0</li>
+</ul>
+<ul style="list-style-type: disc;">
+<li style="text-align: left;"><strong>void LoRa_send(LoRa_ctl *modem) - </strong>Commands radio module to send&nbsp; data from buffer</li>
+<li style="text-align: left;"><strong>void LoRa_receive(LoRa_ctl *modem) - </strong>Commands radio module to switch to continuous receive mode</li>
+<li style="text-align: left;"><strong>void LoRa_calculate_packet_t(LoRa_ctl *modem) - </strong>Calculates onair time, payload symbols and other fields.</li>
+<li style="text-align: left;"><strong>_Bool LoRa_check_conn(LoRa_ctl *modem) - </strong>Checks connection vith module. Return True/False</li>
+<li style="text-align: left;"><strong>void LoRa_end(LoRa_ctl *modem) - </strong>Ends up working with module. Switches to sleep mode, closes spi and so on.</li>
+<li style="text-align: left;"><strong>void LoRa_stop_receive(LoRa_ctl *modem) -&nbsp;</strong>Removes callback from IRQ pin, switches module to idle mode.</li>
+<li style="text-align: left;"><strong>void LoRa_sleep(LoRa_ctl *modem) - </strong>Switches module to sleep mode</li>
+<li style="text-align: left;"><strong>unsigned char LoRa_get_op_mode(LoRa_ctl *modem)</strong> -<strong>&nbsp;</strong>Returns current module operational mode - SLEEP_MODE, RXCONT_MODE, SLEEP_MODE, STDBY_MODE</li>
+</ul>
+<ul style="list-style-type: disc;">
+<li style="text-align: left;"><strong>struct&nbsp;LoRa_ctl - </strong>view LoRa.h</li>
+</ul>
 
 <h3><strong>Notice:</strong></h3>
 
