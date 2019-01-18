@@ -81,4 +81,4 @@
 <p>Now you can start sending data from Rx callback, or vice versa, or any other operation with radio module.</p>
 <p>New examples "ping.c" and "pong.c" to explain new features. Make, then execute on different devices first "pong" then "ping".</p>
 
-<h2><strong>Supported by <a href="http://zaoitt.ru/">ITT ltd</a>&nbsp;</strong></h2>
+<strong>Supported by <a href="http://zaoitt.ru/">ITT ltd</a>&nbsp;</strong>
