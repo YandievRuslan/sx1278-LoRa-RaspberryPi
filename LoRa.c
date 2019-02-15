@@ -231,6 +231,7 @@ void * startTxCallback(void *arg){
 void LoRa_end(LoRa_ctl *modem){
     LoRa_stop_receive(modem);
     spiClose(modem->spid);
+    modem->spid =-1;
 }
 
 void LoRa_stop_receive(LoRa_ctl *modem){
