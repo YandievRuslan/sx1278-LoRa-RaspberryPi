@@ -81,4 +81,11 @@
 <p>Now you can start sending data from Rx callback, or vice versa, or any other operation with radio module.</p>
 <p>New examples "ping.c" and "pong.c" to explain new features. Make, then execute on different devices first "pong" then "ping".</p>
 
+<h3><strong>10.04.2020 update</strong></h3>
+
+<p>Added pipe. Will transmit standard input, otherwise listens and prints received data to stdout. Transmission info is sent to stderr. Best used with fifo files.</p>
+<p>Run './pipe | bash -x' on receiver and 'echo "uptime" | ./pipe' on sender. </p>
+<p>You can use mkfifo and tail: 'mkfifo test && tail -f test | ./pipe', then use 'echo "uptime" > test'. </p>
+
+
 <strong>Supported by <a href="http://zaoitt.ru/">ITT ltd</a>&nbsp;</strong>
