@@ -3,7 +3,7 @@
 
 void tx_f(txData *tx){
     LoRa_ctl *modem = (LoRa_ctl *)(tx->userPtr);
-    fprintf(stderr, "SENT: %s", tx->buf); 
+    fprintf(stderr, "ENT: %s", tx->buf); 
     fflush(stderr);
     LoRa_receive(modem);
 }
@@ -14,9 +14,14 @@ void rx_f(rxData *rx){
     fprintf(stderr, "RSSI: %d\t", rx->RSSI);
     fprintf(stderr, "CRC: %d\t", rx->CRC);
     fprintf(stderr, "Size: %d\n", rx->size);
+    
+    if(rx->buf[strlen(rx->buf)-1] == '\n' && rx->CRC == 0){
+        fprintf(stdout, "%s", rx->buf); 
+        fflush(stdout);
+    } else {
+        fprintf(stderr, "ERROR, ICOMPLETE: %d\n", rx->buf);
+    }
     fflush(stderr);
-    fprintf(stdout, "%s", rx->buf); 
-    fflush(stdout);
 }
 
 int main(){
@@ -34,11 +39,11 @@ int main(){
     modem.rx.data.userPtr = (void *)(&modem);//To handle with chip from rx callback
     modem.tx.data.userPtr = (void *)(&modem);//To handle with chip from tx callback
     modem.eth.preambleLen=6;
-    modem.eth.bw = BW62_5;//Bandwidth 62.5KHz
+    modem.eth.bw = BW31_25;//Bandwidth 31.25KHz
     modem.eth.sf = SF12;//Spreading Factor 12
-    modem.eth.ecr = CR8;//Error coding rate CR4/8
+    modem.eth.ecr = CR6;//Error coding rate CR4/8
     modem.eth.CRC = 1;//Turn on CRC checking
-    modem.eth.freq = 434800000;// 434.8MHz
+    modem.eth.freq = 434700000;// 434.7MHz  Kanal 66-67 ( 434.700 - 434.749 ) (Kasutame ~ 434.700 - 434.732)
     modem.eth.resetGpioN = 4;//GPIO4 on lora RESET pin
     modem.eth.dio0GpioN = 17;//GPIO17 on lora DIO0 pin to control Rxdone and Txdone interrupts
     modem.eth.outPower = OP20;//Output power
@@ -53,23 +58,25 @@ int main(){
     LoRa_receive(&modem);
 
     while(LoRa_get_op_mode(&modem) != SLEEP_MODE){
+        sleep(1);
         char mybuf[BUFSIZ];
         fgets(mybuf, sizeof mybuf, stdin);
         if (mybuf[strlen(mybuf)-1] == '\n') {
-            memcpy(modem.tx.data.buf, mybuf, strlen(mybuf) + 1);//copy data we'll sent to buffer
-            modem.tx.data.size = strlen(mybuf) + 1;//Payload len
             while(LoRa_get_op_mode(&modem) != RXCONT_MODE){
                 fprintf(stderr, "Waiting for last transmit to finish.\n"); 
                 sleep(3);
             }
+            fprintf(stderr, "S"); 
+            fflush(stderr);
+            memcpy(modem.tx.data.buf, mybuf, strlen(mybuf) + 1);//copy data we'll sent to buffer
+            //modem.eth.payloadLen = strlen(mybuf) + 1; //use for implicit mode.
+            modem.tx.data.size = strlen(mybuf) + 1;//Payload len
             LoRa_send(&modem);
-            sleep(1);
             memset(mybuf,0,strlen(mybuf));
+            sleep(((int)modem.tx.data.Tpkt/1000)+5);
         }
-        sleep(1);
-    }
 
-    printf("end\n");
+    }
 
     LoRa_end(&modem);
 }
