@@ -1,4 +1,4 @@
-all: receive_implicit receive_explicit transmit_implicit transmit_explicit ping pong pipe
+all: receive_implicit receive_explicit transmit_implicit transmit_explicit ping pong
 
 LoRa.o: LoRa.c
 	gcc -c LoRa.c -o LoRa.o -lpigpio -lrt -pthread -lm
@@ -26,13 +26,7 @@ ping: LoRa.o ping.o
 
 pong: LoRa.o pong.o
 	gcc -o pong pong.o LoRa.o -lpigpio -lrt -pthread -lm
-
-pipe.o: pipe.c
-	gcc -c pipe.c -o pipe.o -lpigpio -lrt -pthread -lm
-
-pipe: LoRa.o pipe.o
-	gcc -o pipe pipe.o LoRa.o -lpigpio -lrt -pthread -lm
-
+	
 transmit_explicit: LoRa.o tx_explicit_example.o
 	gcc -o transmit_explicit tx_explicit_example.o LoRa.o -lpigpio -lrt -pthread -lm
 
