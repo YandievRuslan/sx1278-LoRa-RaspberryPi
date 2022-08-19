@@ -15,32 +15,32 @@
 <td style="width: 70px;">LoRa</td>
 </tr>
 <tr>
-<td style="width: 70px;">GPIO4</td>
+<td style="width: 70px;">GPIO4, pin 7</td>
 <td style="width: 70px;">&nbsp;</td>
 <td style="width: 70px;">RESET</td>
 </tr>
 <tr>
-<td style="width: 70px;">GPIO17</td>
+<td style="width: 70px;">GPIO17, pin 11</td>
 <td style="width: 70px;">&nbsp;</td>
 <td style="width: 70px;">DIO0</td>
 </tr>
 <tr>
-<td style="width: 70px;">MOSI</td>
+<td style="width: 70px;">MOSI (GPIO10, pin 19)</td>
 <td style="width: 70px;">&nbsp;</td>
 <td style="width: 70px;">MOSI</td>
 </tr>
 <tr>
-<td style="width: 70px;">MISO</td>
+<td style="width: 70px;">MISO (GPIO9, pin 21)</td>
 <td style="width: 70px;">&nbsp;</td>
 <td style="width: 70px;">MISO</td>
 </tr>
 <tr>
-<td style="width: 70px;">CLK</td>
+<td style="width: 70px;">CLK (GPIO11, pin 23)</td>
 <td style="width: 70px;">&nbsp;</td>
 <td style="width: 70px;">SCK</td>
 </tr>
 <tr>
-<td style="width: 70px;">SPI_CE0</td>
+<td style="width: 70px;">SPI_CE0 (GPIO8, pin 24)</td>
 <td style="width: 70px;">&nbsp;</td>
 <td style="width: 70px;">NSS</td>
 </tr>
