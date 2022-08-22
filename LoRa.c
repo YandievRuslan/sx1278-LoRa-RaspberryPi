@@ -190,6 +190,8 @@ void rxDoneISRf(int gpio_n, int level, uint32_t tick, void *modemptr){
     if(lora_reg_read_byte(modem->spid, REG_IRQ_FLAGS) & IRQ_RXDONE){
         lora_reg_write_byte(modem->spid, REG_FIFO_ADDR_PTR, lora_reg_read_byte(modem->spid, REG_FIFO_RX_CURRENT_ADDR));
         
+	gettimeofday(&modem->rx.data.last_time, NULL);
+	    
         if(modem->eth.implicitHeader){
             lora_reg_read_bytes(modem->spid, REG_FIFO, modem->rx.data.buf, modem->eth.payloadLen);
             modem->rx.data.size = modem->eth.payloadLen;
