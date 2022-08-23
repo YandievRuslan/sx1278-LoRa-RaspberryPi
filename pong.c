@@ -26,6 +26,7 @@ void * rx_f(void *p){
     printf("Time on air data - Tsym: %f;\t", modem->tx.data.Tsym);
     printf("Tpkt: %f;\t", modem->tx.data.Tpkt);
     printf("payloadSymbNb: %u\n", modem->tx.data.payloadSymbNb);
+    free(p);
 
     return NULL;
 }

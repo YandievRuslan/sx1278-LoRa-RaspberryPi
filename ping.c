@@ -20,6 +20,7 @@ void * rx_f(void *p){
     printf("SNR: %f\n", rx->SNR);
     
     LoRa_sleep(modem);
+    free(p);
 
     return NULL;
 }

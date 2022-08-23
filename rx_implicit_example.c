@@ -7,6 +7,7 @@ void * rx_f(void *p){
     printf("string: %s\n", rx->buf);//Data we'v received
     printf("RSSI: %d\n", rx->RSSI);
     printf("SNR: %f\n", rx->SNR);
+    free(p);
     return NULL;
 }
 
