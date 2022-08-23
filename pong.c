@@ -8,7 +8,8 @@ void tx_f(txData *tx){
     LoRa_sleep(modem);
 }
 
-void rx_f(rxData *rx){
+void * rx_f(void *p){
+    rxData *rx = (rxData *)p;
     LoRa_ctl *modem = (LoRa_ctl *)(rx->userPtr);
     LoRa_stop_receive(modem);//manually stoping RxCont mode
     printf("rx done;\t");
@@ -25,6 +26,8 @@ void rx_f(rxData *rx){
     printf("Time on air data - Tsym: %f;\t", modem->tx.data.Tsym);
     printf("Tpkt: %f;\t", modem->tx.data.Tpkt);
     printf("payloadSymbNb: %u\n", modem->tx.data.payloadSymbNb);
+
+    return NULL;
 }
 
 int main(){
@@ -38,7 +41,6 @@ int main(){
     modem.tx.callback = tx_f;
     modem.tx.data.buf = txbuf;
     modem.rx.callback = rx_f;
-    modem.rx.data.buf = rxbuf;
     modem.rx.data.userPtr = (void *)(&modem);//To handle with chip from rx callback
     modem.tx.data.userPtr = (void *)(&modem);//To handle with chip from tx callback
     modem.eth.preambleLen=6;
