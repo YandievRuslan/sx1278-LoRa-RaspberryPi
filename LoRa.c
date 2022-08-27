@@ -3,6 +3,10 @@
 #include "LoRa.h"
 
 int LoRa_begin(LoRa_ctl *modem) {
+	int cfg = gpioCfgGetInternals();
+	cfg |= PI_CFG_NOSIGHANDLER;  // (1<<10)
+	gpioCfgSetInternals(cfg);
+
 	if (gpioInitialise() < 0)
 	{
 		printf("Pigpio init error\n");
@@ -128,7 +132,7 @@ void LoRa_send(LoRa_ctl *modem){
 	if(lora_get_op_mode(modem->spid) != STDBY_MODE){
 		lora_set_satandby_mode(modem->spid);
 	}
-	LoRa_calculate_packet_t(modem);
+	LoRa_calculate_packet_t(modem, &modem->tx.data.at);
 	if(modem->eth.lowDataRateOptimize){
 		lora_set_lowdatarateoptimize_on(modem->spid);
 	}
@@ -149,8 +153,6 @@ void LoRa_send(LoRa_ctl *modem){
 }
 
 void LoRa_receive(LoRa_ctl *modem){
-
-	LoRa_calculate_packet_t(modem);
 	if(modem->eth.lowDataRateOptimize){
 		lora_set_lowdatarateoptimize_on(modem->spid);
 	}
@@ -204,12 +206,17 @@ void rxDoneISRf(int gpio_n, int level, uint32_t tick, void *modemptr){
 			lora_reg_read_bytes(modem->spid, REG_FIFO, modem->rx.data.buf, rx_nb_bytes);
 			modem->rx.data.size = rx_nb_bytes;
 		}
+
+		modem->rx.data.buf[modem->rx.data.size] = 0x00; // convenience terminating 0x00
+
 		modem->rx.data.CRC = (lora_reg_read_byte(modem->spid, REG_IRQ_FLAGS) & 0x20);
 		lora_get_rssi_pkt(modem);
 		lora_get_snr(modem);
 		lora_reset_irq_flags(modem->spid);
 
 		if (modem->rx.data.size > 0) {
+			LoRa_calculate_packet_t(modem, &modem->rx.data.at);
+
 			rxData *temp = (rxData *)malloc(sizeof(modem->rx.data));
 
 			if (!temp)
@@ -263,7 +270,8 @@ unsigned char lora_get_op_mode(int spid){
 	return (lora_reg_read_byte(spid, REG_OP_MODE) & 0x07);
 }
 
-void LoRa_calculate_packet_t(LoRa_ctl *modem){
+// using same parameters for received packets
+void LoRa_calculate_packet_t(LoRa_ctl *modem, airTime *at){
 	unsigned BW_VAL[10] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
 
 	double Tsym, Tpreamle, Tpayload, Tpacket;
@@ -293,9 +301,9 @@ void LoRa_calculate_packet_t(LoRa_ctl *modem){
 	Tpayload = payloadSymbNb*Tsym;
 	Tpacket = Tpayload+Tpreamle;
 
-	modem->tx.data.Tsym = Tsym;
-	modem->tx.data.Tpkt = Tpacket;
-	modem->tx.data.payloadSymbNb = payloadSymbNb;
+	at->Tsym = Tsym;
+	at->Tpkt = Tpacket;
+	at->payloadSymbNb = payloadSymbNb;
 }
 
 void lora_set_addr_ptr(int spid, unsigned char addr){
