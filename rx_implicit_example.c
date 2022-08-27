@@ -1,22 +1,22 @@
 #include "LoRa.h"
 
-void rx_f(rxData *rx){
+void * rx_f(void *p){
+    rxData *rx = (rxData *)p;
     printf("rx done \n");
     printf("CRC error: %d\n", rx->CRC);
     printf("string: %s\n", rx->buf);//Data we'v received
     printf("RSSI: %d\n", rx->RSSI);
     printf("SNR: %f\n", rx->SNR);
+    free(p);
+    return NULL;
 }
 
 int main(){
-
-    char rxbuf[255];
     LoRa_ctl modem;
 
     //See for typedefs, enumerations and there values in LoRa.h header file
     modem.spiCS = 0;//Raspberry SPI CE pin number
     modem.rx.callback = rx_f;
-    modem.rx.data.buf = rxbuf;
     modem.eth.payloadLen = 5;//payload len used in implicit header mode
     modem.eth.preambleLen=6;
     modem.eth.bw = BW62_5;//Bandwidth 62.5KHz

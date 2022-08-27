@@ -8,7 +8,8 @@ void tx_f(txData *tx){
     LoRa_receive(modem);
 }
 
-void rx_f(rxData *rx){
+void * rx_f(void *p){
+    rxData *rx = (rxData *)p;
     LoRa_ctl *modem = (LoRa_ctl *)(rx->userPtr);
     LoRa_stop_receive(modem);//manually stoping RxCont mode
     printf("rx done;\t");
@@ -19,12 +20,14 @@ void rx_f(rxData *rx){
     printf("SNR: %f\n", rx->SNR);
     
     LoRa_sleep(modem);
+    free(p);
+
+    return NULL;
 }
 
 int main(){
 
     char txbuf[255];
-    char rxbuf[255];
     LoRa_ctl modem;
 
     //See for typedefs, enumerations and there values in LoRa.h header file
@@ -32,7 +35,6 @@ int main(){
     modem.tx.callback = tx_f;
     modem.tx.data.buf = txbuf;
     modem.rx.callback = rx_f;
-    modem.rx.data.buf = rxbuf;
     modem.rx.data.userPtr = (void *)(&modem);//To handle with chip from rx callback
     modem.tx.data.userPtr = (void *)(&modem);//To handle with chip from tx callback
     memcpy(modem.tx.data.buf, "Ping", 5);//copy data we'll sent to buffer

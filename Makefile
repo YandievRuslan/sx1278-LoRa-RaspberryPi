@@ -38,3 +38,6 @@ receive_explicit: LoRa.o rx_explicit_example.o
 
 receive_implicit: LoRa.o rx_implicit_example.o
 	gcc -o receive_implicit rx_implicit_example.o LoRa.o -lpigpio -lrt -pthread -lm
+
+clean:
+	rm *.o receive_*plicit transmit_*plicit ping pong
